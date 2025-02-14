@@ -24,7 +24,7 @@ import static net.kyori.adventure.text.minimessage.MiniMessage.*;
  * All utilities needed for making, changing and customizing ItemStacks.
  * <br>
  * Methods will return null in case of being wrongly used.
- * The most likely reason for receiving null is either a null item or item without any itemMeta.
+ * The most likely reason for having null returned is either a null item or item without any itemMeta.
  * <p>
  * This class makes use of {@link MiniMessage} format.
  * </p>
