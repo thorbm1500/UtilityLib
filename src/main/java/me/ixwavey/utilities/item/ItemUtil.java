@@ -39,6 +39,13 @@ public class ItemUtil {
         return item != null && item.getItemMeta() != null;
     }
 
+    private static String removeDefaultFormat(final String text) {
+        if (!text.contains("<!italic>") && !text.contains("<italic>")) {
+            return "%s%s".formatted("<!italic>", text);
+        }
+        return text;
+    }
+
     /**
      * Set an item's displayname.
      *
@@ -49,7 +56,7 @@ public class ItemUtil {
         if (!isValid(item)) return;
 
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(miniMessage().deserialize(name));
+        meta.displayName(miniMessage().deserialize(removeDefaultFormat(name)));
         item.setItemMeta(meta);
     }
 
@@ -63,7 +70,7 @@ public class ItemUtil {
         if (!isValid(item)) return;
 
         ItemMeta meta = item.getItemMeta();
-        meta.lore(of(miniMessage().deserialize(line)));
+        meta.lore(of(miniMessage().deserialize(removeDefaultFormat(line))));
         item.setItemMeta(meta);
     }
 
@@ -78,8 +85,8 @@ public class ItemUtil {
 
         ItemMeta meta = item.getItemMeta();
         List<Component> lore = new ArrayList<>();
-        for (var line : lines) {
-            lore.add(miniMessage().deserialize(line));
+        for (String line : lines) {
+            lore.add(miniMessage().deserialize(removeDefaultFormat(line)));
         }
         meta.lore(lore);
         item.setItemMeta(meta);
@@ -97,9 +104,9 @@ public class ItemUtil {
         ItemMeta meta = item.getItemMeta();
         List<Component> currentLore = meta.lore();
 
-        if (currentLore == null) return;
+        if (currentLore == null) currentLore = new ArrayList<>();
 
-        currentLore.add(miniMessage().deserialize(line));
+        currentLore.add(miniMessage().deserialize(removeDefaultFormat(line)));
         meta.lore(currentLore);
         item.setItemMeta(meta);
     }
@@ -116,10 +123,10 @@ public class ItemUtil {
         ItemMeta meta = item.getItemMeta();
         List<Component> currentLore = meta.lore();
 
-        if (currentLore == null) return;
+        if (currentLore == null) currentLore = new ArrayList<>();
 
         for (var line : lines) {
-            currentLore.add(miniMessage().deserialize(line));
+            currentLore.add(miniMessage().deserialize(removeDefaultFormat(line)));
         }
 
         meta.lore(currentLore);
