@@ -16,87 +16,117 @@ public class Formatter {
      * Converts normal letters from A-Z to the popular "Minecraft Small Font".
      *
      * @param text Text to convert.
-     * @return Converted text.
      */
     @Contract(pure = true)
-    public static @NotNull String toMinecraftSmallFont(String text) {
-        text = text.toLowerCase();
-        StringBuilder formattedText = new StringBuilder();
-        for (int i = 0; i < text.length(); i++) {
-            switch (text.charAt(i)) {
-                case 'a' -> formattedText.append("ᴀ");
-                case 'b' -> formattedText.append("ʙ");
-                case 'c' -> formattedText.append("ᴄ");
-                case 'd' -> formattedText.append("ᴅ");
-                case 'e' -> formattedText.append("ᴇ");
-                case 'f' -> formattedText.append("ғ");
-                case 'g' -> formattedText.append("ɢ");
-                case 'h' -> formattedText.append("ʜ");
-                case 'i' -> formattedText.append("ɪ");
-                case 'j' -> formattedText.append("ᴊ");
-                case 'k' -> formattedText.append("ᴋ");
-                case 'l' -> formattedText.append("ʟ");
-                case 'm' -> formattedText.append("ᴍ");
-                case 'n' -> formattedText.append("ɴ");
-                case 'o' -> formattedText.append("ᴏ");
-                case 'p' -> formattedText.append("ᴘ");
-                case 'q' -> formattedText.append("ǫ");
-                case 'r' -> formattedText.append("ʀ");
-                case 's' -> formattedText.append("s");
-                case 't' -> formattedText.append("ᴛ");
-                case 'u' -> formattedText.append("ᴜ");
-                case 'v' -> formattedText.append("ᴠ");
-                case 'w' -> formattedText.append("ᴡ");
-                case 'x' -> formattedText.append("x");
-                case 'y' -> formattedText.append("ʏ");
-                case 'z' -> formattedText.append("ᴢ");
-                case ' ' -> formattedText.append(" ");
+    public static void toMinecraftSmallFont(@NotNull final String text)throws IllegalArgumentException {
+        text.chars().forEach(c -> c = getMinecraftFontChar((char) c));
+    }
+
+    /**
+     * Get the corresponding Minecraft Small Font character. Accepts a-z & A-Z
+     * @param c Char to compare with.
+     * @return Character from the Minecraft Small Font.
+     * @throws IllegalArgumentException Should provided char not have a corresponding character.
+     */
+    private static char getMinecraftFontChar(final char c)throws IllegalArgumentException {
+        return switch(c) {
+            case 'a','A' -> 'ᴀ';
+            case 'b','B' -> 'ʙ';
+            case 'c','C' -> 'ᴄ';
+            case 'd','D' -> 'ᴅ';
+            case 'e','E' -> 'ᴇ';
+            case 'f','F' -> 'ғ';
+            case 'g','G' -> 'ɢ';
+            case 'h','H' -> 'ʜ';
+            case 'i','I' -> 'ɪ';
+            case 'j','J' -> 'ᴊ';
+            case 'k','K' -> 'ᴋ';
+            case 'l','L' -> 'ʟ';
+            case 'm','M' -> 'ᴍ';
+            case 'n','N' -> 'ɴ';
+            case 'o','O' -> 'ᴏ';
+            case 'p','P' -> 'ᴘ';
+            case 'q','Q' -> 'ǫ';
+            case 'r','R' -> 'ʀ';
+            case 's','S' -> 's';
+            case 't','T' -> 'ᴛ';
+            case 'u','U' -> 'ᴜ';
+            case 'v','V' -> 'ᴠ';
+            case 'w','W' -> 'ᴡ';
+            case 'x','X' -> 'x';
+            case 'y','Y' -> 'ʏ';
+            case 'z','Z' -> 'ᴢ';
+            case ' ' -> ' ';
+            default -> throw new IllegalStateException("Unexpected value: " + c);
+        };
+    }
+
+    private static char getNormalCharFromMinecraftChar(final char c) {
+        return switch(c) {
+            case 'ᴀ' -> 'a';
+            case 'ʙ' -> 'b';
+            case 'ᴄ' -> 'c';
+            case 'ᴅ' -> 'd';
+            case 'ᴇ' -> 'e';
+            case 'ғ' -> 'f';
+            case 'ɢ' -> 'g';
+            case 'ʜ' -> 'h';
+            case 'ɪ' -> 'i';
+            case 'ᴊ' -> 'j';
+            case 'ᴋ' -> 'k';
+            case 'ʟ' -> 'l';
+            case 'ᴍ' -> 'm';
+            case 'ɴ' -> 'n';
+            case 'ᴏ' -> 'o';
+            case 'ᴘ' -> 'p';
+            case 'ǫ' -> 'q';
+            case 'ʀ' -> 'r';
+            case 's' -> 's';
+            case 'ᴛ' -> 't';
+            case 'ᴜ' -> 'u';
+            case 'ᴠ' -> 'v';
+            case 'ᴡ' -> 'w';
+            case 'x' -> 'x';
+            case 'ʏ' -> 'y';
+            case 'ᴢ' -> 'z';
+            case ' ' -> ' ';
+            default -> throw new IllegalStateException("Unexpected value: " + c);
+        };
+    }
+
+    /**
+     * Converts "Minecraft Small Font" letters from A-Z to normal letters.
+     *
+     * @param locale Locale to format text to. (Letter capitalization)
+     * @param text Text to convert.
+     */
+    @Contract(pure = true)
+    public static void fromMinecraftSmallFont(@NotNull final String text, final Locale locale) {
+        text.chars().forEach(c -> c = getMinecraftFontChar((char) c));
+        if (locale != null) {
+            String copy = text.toUpperCase(locale);
+            for(int i = 0 ; i < copy.length() ; i++) {
+                char checked = copy.charAt(i);
+                if (Character.isUpperCase(checked)) {
+                    text.chars().forEach(c -> {
+                        if (c==Character.toLowerCase(checked)) {
+                            c = checked;
+                        }
+                    });
+                    String c = String.valueOf(copy.charAt(i)).toLowerCase();
+                }
             }
         }
-        return formattedText.toString();
     }
 
     /**
      * Converts "Minecraft Small Font" letters from A-Z to normal letters.
      *
      * @param text Text to convert.
-     * @return Converted text in lowercase.
      */
     @Contract(pure = true)
-    public static @NotNull String fromMinecraftSmallFont(final @NotNull String text) {
-        StringBuilder formattedText = new StringBuilder();
-        for (int i = 0; i < text.length(); i++) {
-            switch (text.charAt(i)) {
-                case 'ᴀ' -> formattedText.append("a");
-                case 'ʙ' -> formattedText.append("b");
-                case 'ᴄ' -> formattedText.append("c");
-                case 'ᴅ' -> formattedText.append("d");
-                case 'ᴇ' -> formattedText.append("e");
-                case 'ғ' -> formattedText.append("f");
-                case 'ɢ' -> formattedText.append("g");
-                case 'ʜ' -> formattedText.append("h");
-                case 'ɪ' -> formattedText.append("i");
-                case 'ᴊ' -> formattedText.append("j");
-                case 'ᴋ' -> formattedText.append("k");
-                case 'ʟ' -> formattedText.append("l");
-                case 'ᴍ' -> formattedText.append("m");
-                case 'ɴ' -> formattedText.append("n");
-                case 'ᴏ' -> formattedText.append("o");
-                case 'ᴘ' -> formattedText.append("p");
-                case 'ǫ' -> formattedText.append("q");
-                case 'ʀ' -> formattedText.append("r");
-                case 's' -> formattedText.append("s");
-                case 'ᴛ' -> formattedText.append("t");
-                case 'ᴜ' -> formattedText.append("u");
-                case 'ᴠ' -> formattedText.append("v");
-                case 'ᴡ' -> formattedText.append("w");
-                case 'x' -> formattedText.append("x");
-                case 'ʏ' -> formattedText.append("y");
-                case 'ᴢ' -> formattedText.append("z");
-                case ' ' -> formattedText.append(" ");
-            }
-        }
-        return formattedText.toString();
+    public static void fromMinecraftSmallFont(@NotNull final String text) {
+        fromMinecraftSmallFont(text, null);
     }
 
     /**
@@ -306,5 +336,33 @@ public class Formatter {
     public static @NotNull String formatPercentage(final double number) {
         DecimalFormat numberFormat = new DecimalFormat("#.##");
         return numberFormat.format(number) + "%";
+    }
+
+    /**
+     * Format seconds to time.
+     * @param time Time in seconds
+     * @param withDescriptions Whether to add "Seconds", "Minutes", and "Hours" to the final string.
+     * @return Formatted string of time.
+     */
+    @Contract(pure = true)
+    public static @NotNull String formatTime(final double time, final boolean withDescriptions) {
+        final double minutes = time / 60;
+        final double hours = minutes / 60;
+        final double seconds = time % 60;
+        if (hours != 0) {
+            if (withDescriptions) {
+                return "%s %s, %s %s, and %s %s".formatted(String.valueOf(hours),hours > 1 ? "hours" : "hour",
+                        String.valueOf(minutes), minutes == 1 ? "minute" : "minutes", String.valueOf(seconds), seconds == 1 ? "second" : "seconds");
+            }
+            return hours + ":" + minutes + ":" + seconds;
+        } else if (minutes != 0) {
+            if (withDescriptions) {
+                return "%s %s and %s %s".formatted(String.valueOf(minutes), minutes == 1 ? "minute" : "minutes", String.valueOf(seconds), seconds == 1 ? "second" : "seconds");
+            } else {
+                return minutes + ":" + seconds;
+            }
+        } else if (withDescriptions) {
+            return "%s %s".formatted(String.valueOf(seconds), seconds == 1 ? "second" : "seconds");
+        } else return "00:" + seconds;
     }
 }

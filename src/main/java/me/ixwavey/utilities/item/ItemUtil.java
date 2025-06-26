@@ -93,6 +93,24 @@ public class ItemUtil {
     }
 
     /**
+     * Set the item's lore with multiple lines.
+     *
+     * @param item  Item to update.
+     * @param lines New lore.
+     */
+    public static void setLore(final ItemStack item, final List<String> lines) {
+        if (!isValid(item)) return;
+
+        ItemMeta meta = item.getItemMeta();
+        List<Component> lore = new ArrayList<>();
+        for (String line : lines) {
+            lore.add(miniMessage().deserialize(removeDefaultFormat(line)));
+        }
+        meta.lore(lore);
+        item.setItemMeta(meta);
+    }
+
+    /**
      * Add a new line of lore to the item, without losing or changing the current lore.
      *
      * @param item Item to update.
