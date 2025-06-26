@@ -346,9 +346,10 @@ public class Formatter {
      */
     @Contract(pure = true)
     public static @NotNull String formatTime(final double time, final boolean withDescriptions) {
-        final int minutes = (int) time / 60;
-        final int hours = minutes / 60;
-        final int seconds = (int) time % 60;
+        final int convertedTime = (int) time;
+        final int hours = (convertedTime / 60) / 60;
+        final int minutes = (convertedTime / 60) % 60;
+        final int seconds = convertedTime % 60;
         if (hours != 0) {
             if (withDescriptions) {
                 return "%s %s, %s %s, and %s %s".formatted(String.valueOf(hours),hours > 1 ? "hours" : "hour",
