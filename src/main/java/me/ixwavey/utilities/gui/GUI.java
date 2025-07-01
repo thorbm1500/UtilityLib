@@ -3,7 +3,6 @@ package me.ixwavey.utilities.gui;
 import me.ixwavey.utilities.gui.util.Button;
 import me.ixwavey.utilities.gui.util.Filler;
 import me.ixwavey.utilities.gui.util.InventorySize;
-import me.ixwavey.utilities.gui.util.Page;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,22 +14,35 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Stack;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
-public abstract class GUI implements Listener {
+public abstract class GUI<E extends Enum<E>> implements Listener {
 
-    private static final HashMap<UUID, GUI> instances = new HashMap<>();
+    //Management
+    private static final HashMap<UUID, GUI<?>> instances = new HashMap<>();
+
+    //Instance
     protected final Player player;
     protected final UUID uuid;
     private final Plugin plugin;
     private final Inventory inventory;
-    private Page currentPage;
+    private E page;
+    private final EnumMap<E, Runnable> pages;
+    private final Stack<E> history = new Stack<>();
+    private final HashMap<Integer, Button> buttons = new HashMap<>();
+    private final HashMap<Integer, ItemStack> items = new HashMap<>();
+
+    //GUI Settings
     private Filler filler = Filler.BLACK;
     private boolean allowItemPickup = true;
     private boolean allowQuickClose = true;
@@ -42,8 +54,8 @@ public abstract class GUI implements Listener {
      * @param plugin Plugin calling the GUI.
      * @param player The player linked to the GUI.
      */
-    public GUI(final Plugin plugin, final Player player) {
-        this(plugin, player, InventorySize.SMALL, null, null);
+    public GUI(final Plugin plugin, final Player player, final Class<E> enumClass) {
+        this(plugin, player, InventorySize.SMALL, null, null, enumClass);
     }
 
     /**
@@ -53,8 +65,8 @@ public abstract class GUI implements Listener {
      * @param player The player linked to the GUI.
      * @param title  The title of the inventory.
      */
-    public GUI(final Plugin plugin, final Player player, final String title) {
-        this(plugin, player, InventorySize.SMALL, title, null);
+    public GUI(final Plugin plugin, final Player player, final String title, final Class<E> enumClass) {
+        this(plugin, player, InventorySize.SMALL, title, null, enumClass);
     }
 
     /**
@@ -64,8 +76,8 @@ public abstract class GUI implements Listener {
      * @param player The player linked to the GUI.
      * @param size   The size of the inventory.
      */
-    public GUI(final Plugin plugin, final Player player, final InventorySize size) {
-        this(plugin, player, size, null, null);
+    public GUI(final Plugin plugin, final Player player, final InventorySize size, final Class<E> enumClass) {
+        this(plugin, player, size, null, null, enumClass);
     }
 
     /**
@@ -76,8 +88,8 @@ public abstract class GUI implements Listener {
      * @param size   The size of the inventory.
      * @param title  The title of the inventory.
      */
-    public GUI(final Plugin plugin, final Player player, final InventorySize size, final String title) {
-        this(plugin, player, size, title, null);
+    public GUI(final Plugin plugin, final Player player, final InventorySize size, final String title, final Class<E> enumClass) {
+        this(plugin, player, size, title, null, enumClass);
     }
 
     /**
@@ -88,8 +100,8 @@ public abstract class GUI implements Listener {
      * @param size   The size of the inventory.
      * @param filler The item the inventory is filled with as background.
      */
-    public GUI(final Plugin plugin, final Player player, final InventorySize size, final Filler filler) {
-        this(plugin, player, size, null, filler);
+    public GUI(final Plugin plugin, final Player player, final InventorySize size, final Filler filler, final Class<E> enumClass) {
+        this(plugin, player, size, null, filler, enumClass);
     }
 
     /**
@@ -101,13 +113,44 @@ public abstract class GUI implements Listener {
      * @param title  The title of the inventory.
      * @param filler The item the inventory is filled with as background.
      */
-    public GUI(final Plugin plugin, final Player player, final InventorySize size, @Nullable final String title, @Nullable final Filler filler) {
+    public GUI(final Plugin plugin, final Player player, final InventorySize size, @Nullable final String title, @Nullable final Filler filler, final Class<E> enumClass) {
         this.plugin = plugin;
         this.player = player;
         this.uuid = player.getUniqueId();
+        this.pages = new EnumMap<>(enumClass);
         newInstance();
         this.inventory = title == null ? Bukkit.createInventory(player, size.get()) : Bukkit.createInventory(player, size.get(), MiniMessage.miniMessage().deserialize(title));
         this.filler = filler == null ? this.filler : filler;
+    }
+
+    /**
+     * Register pages to the menu.
+     * @param page The Enum of the Page to register.
+     * @param runnable The method attached to the page, for rendering its components.
+     * @return The GUI instance.
+     */
+    protected GUI<?> registerPage(E page, @NotNull Runnable runnable) {
+        this.pages.put(page,runnable);
+        return this;
+    }
+
+    /**
+     * Renders the current page to the screen. This is used automatically and should not be needed to be called manually.
+     * @return The GUI instance.
+     * @throws IllegalStateException In case no pages has been registered.
+     */
+    protected GUI<?> renderPage()throws  IllegalStateException {
+        if (page == null) throw new IllegalStateException("No pages has been registered. The menu relies on pages, and will not function without defining the pages to render.");
+        fill();
+        this.pages.get(this.page).run();
+        for (var index : buttons.entrySet()) {
+            inventory.setItem(index.getKey(),index.getValue().getItem());
+            items.remove(index.getKey());
+        }
+        for (var index : items.entrySet()) {
+            inventory.setItem(index.getKey(),index.getValue());
+        }
+        return this;
     }
 
     /**
@@ -115,26 +158,26 @@ public abstract class GUI implements Listener {
      * @param page Page to update to.
      * @return The GUI instance.
      */
-    protected GUI changePage(final Page page) {
-        this.currentPage = page;
-        update();
+    protected GUI<?> changePage(final E page) {
+        history.add(this.page);
+        this.page = page;
+        clearComponents();
+        renderPage();
         return this;
     }
 
-    /**
-     * Fills the menu with the current items and buttons present. Use this to update the view of the GUI after creating new buttons and items.
-     * @return The GUI instance.
-     */
-    protected GUI update()throws IllegalStateException {
-        if (currentPage == null) throw new IllegalStateException("No current page has been set. The menu relies on pages, and will not function without defining the current page to render.");
-        currentPage.generate();
-        fill();
-        for (var index : currentPage.getItems().entrySet()) {
-            inventory.setItem(index.getKey(), index.getValue());
-        }
-        for (var index : currentPage.getButtons().entrySet()) {
-            inventory.setItem(index.getKey(), index.getValue().getItem());
-        }
+    private void clearComponents() {
+        buttons.clear();
+        items.clear();
+    }
+
+    protected GUI<?> addButton(final int slot, final Button button) {
+        buttons.put(slot,button);
+        return this;
+    }
+
+    protected GUI<?> addItem(final int slot, final ItemStack item) {
+        items.put(slot,item);
         return this;
     }
 
@@ -142,7 +185,7 @@ public abstract class GUI implements Listener {
      * Fills the inventory with the filler item.
      * @return The GUI instance.
      */
-    protected GUI fill() {
+    protected GUI<?> fill() {
         return fill(0, inventory.getSize() - 1);
     }
 
@@ -152,7 +195,7 @@ public abstract class GUI implements Listener {
      * @param end End slot of the fill area.
      * @return The GUI instance.
      */
-    protected GUI fill(final int start, final int end) {
+    protected GUI<?> fill(final int start, final int end) {
         for (int i = start; i <= end; i++) {
             inventory.setItem(i, filler.get());
         }
@@ -164,7 +207,7 @@ public abstract class GUI implements Listener {
      * @param allow True | False
      * @return The GUI instance.
      */
-    protected GUI allowItemPickup(final boolean allow) {
+    protected GUI<?> allowItemPickup(final boolean allow) {
         this.allowItemPickup = allow;
         return this;
     }
@@ -174,7 +217,7 @@ public abstract class GUI implements Listener {
      * @param allow True | False
      * @return The GUI instance.
      */
-    protected GUI allowQuickClose(final boolean allow) {
+    protected GUI<?> allowQuickClose(final boolean allow) {
         this.allowQuickClose = allow;
         return this;
     }
@@ -184,7 +227,7 @@ public abstract class GUI implements Listener {
      * @param destroy True | False
      * @return The GUI instance.
      */
-    protected GUI destroyOnClose(final boolean destroy) {
+    protected GUI<?> destroyOnClose(final boolean destroy) {
         this.destroyOnClose = destroy;
         return this;
     }
@@ -194,7 +237,7 @@ public abstract class GUI implements Listener {
      * @param filler Filler to update to.
      * @return The GUI instance.
      */
-    protected GUI setFiller(final Filler filler) {
+    protected GUI<?> setFiller(final Filler filler) {
         this.filler = filler;
         return this;
     }
@@ -203,7 +246,7 @@ public abstract class GUI implements Listener {
      * Used to cache the new instance of the GUI.
      * @return The GUI instance.
      */
-    private GUI newInstance() {
+    private GUI<?> newInstance() {
         if (instances.containsKey(this.uuid)) instances.get(this.uuid).destroy();
         instances.put(uuid, this);
         return this;
@@ -213,7 +256,7 @@ public abstract class GUI implements Listener {
      * Opens the GUI for the Player.
      * @return The GUI instance.
      */
-    protected GUI open() {
+    protected GUI<?> open() {
         registerListeners();
         player.openInventory(inventory);
         return this;
@@ -224,7 +267,7 @@ public abstract class GUI implements Listener {
      * @param destroy Whether the GUI should destroy itself when closed.
      * @return The GUI instance.
      */
-    protected GUI close(final boolean destroy) {
+    protected GUI<?> close(final boolean destroy) {
         if (destroy) destroy();
         else {
             unregisterListeners();
@@ -272,7 +315,7 @@ public abstract class GUI implements Listener {
         if (event.getClick() == ClickType.DOUBLE_CLICK) return;
 
         final int slot = event.getRawSlot();
-        final Button button = currentPage.getButtons().get(slot);
+        final Button button = buttons.get(slot);
         if (button != null) button.onClick(event);
     }
 
@@ -300,5 +343,14 @@ public abstract class GUI implements Listener {
                 open();
             }
         }.runTask(plugin);
+    }
+
+    /**
+     * Get an active GUI instance for a given Player.
+     * @param player The Player.
+     * @return The GUI instance if one was found, otherwise null.
+     */
+    public static GUI<?> hasGUIInstance(final Player player) {
+        return instances.getOrDefault(player.getUniqueId(), null);
     }
 }
