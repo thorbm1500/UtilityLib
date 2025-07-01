@@ -3,8 +3,10 @@ package me.ixwavey.utilities.gui;
 import me.ixwavey.utilities.gui.util.Button;
 import me.ixwavey.utilities.gui.util.Filler;
 import me.ixwavey.utilities.gui.util.InventorySize;
+import me.ixwavey.utilities.item.ItemUtil;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -20,10 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Stack;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public abstract class GUI<E extends Enum<E>> implements Listener {
@@ -47,6 +46,24 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     private boolean allowItemPickup = true;
     private boolean allowQuickClose = true;
     private boolean destroyOnClose = true;
+
+    //Pagination
+    private boolean isPaginated = false;
+    private int paginationStartSlot;
+    private int paginationEndSlot;
+    private int currentPaginationPage = 1;
+    private int maxPaginationPages = 1;
+    private Material nextPageMaterial;
+    private Material previousPageMaterial;
+    private int previousPageButtonSlot;
+    private int nextPageButtonSlot;
+    private String previousPaginatedPageItemTitle = "<#DDDDDD><bold>Previous page";
+    private List<String> previousPaginatedPageItemLore = List.of("<gray>Click to change page.");
+    private String nextPaginatedPageItemTitle = "<#DDDDDD><bold>Next page";
+    private List<String> nextPaginatedPageItemLore = List.of("<gray>Click to change page.");
+    private boolean hideTooltipsOnPageButtons = false;
+    private final List<Object> paginatedItems = new ArrayList<>();
+    private final HashMap<Integer,Button> paginatedButtons = new HashMap<>();
 
     /**
      * Creates a new GUI instance with a medium size.
@@ -139,16 +156,39 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
      * @return The GUI instance.
      * @throws IllegalStateException In case no pages has been registered.
      */
-    protected GUI<?> renderPage()throws  IllegalStateException {
+    protected GUI<?> renderPage() throws IllegalStateException {
         if (page == null) throw new IllegalStateException("No pages has been registered. The menu relies on pages, and will not function without defining the pages to render.");
         fill();
-        this.pages.get(this.page).run();
-        for (var index : buttons.entrySet()) {
-            inventory.setItem(index.getKey(),index.getValue().getItem());
-            items.remove(index.getKey());
-        }
-        for (var index : items.entrySet()) {
-            inventory.setItem(index.getKey(),index.getValue());
+        if (isPaginated) {
+            if (paginatedItems.isEmpty()) {
+                this.pages.get(this.page).run();
+                this.maxPaginationPages = paginatedItems.size() / ((paginationEndSlot + 1) - (paginationStartSlot + 1));
+            }
+            this.paginatedButtons.clear();
+            int i = (currentPaginationPage - 1) * ((paginationEndSlot + 1) - (paginationStartSlot + 1));
+            for (int slot = paginationStartSlot; slot < paginationEndSlot && paginatedItems.size() > i; slot++) {
+                final Object index = paginatedItems.get(i);
+                if (index instanceof ItemStack item) {
+                    inventory.setItem(slot, item);
+                } else if (index instanceof Button button) {
+                    inventory.setItem(slot, button.getItem());
+                    paginatedButtons.put(slot, button);
+                }
+                i++;
+            }
+            paginatedButtons.put(previousPageButtonSlot, createPreviousPageButton());
+            paginatedButtons.put(nextPageButtonSlot, createNextPageButton());
+            inventory.setItem(previousPageButtonSlot, paginatedButtons.get(previousPageButtonSlot).getItem());
+            inventory.setItem(nextPageButtonSlot, paginatedButtons.get(nextPageButtonSlot).getItem());
+        } else {
+            this.pages.get(this.page).run();
+            for (var index : buttons.entrySet()) {
+                inventory.setItem(index.getKey(), index.getValue().getItem());
+                items.remove(index.getKey());
+            }
+            for (var index : items.entrySet()) {
+                inventory.setItem(index.getKey(), index.getValue());
+            }
         }
         return this;
     }
@@ -166,18 +206,64 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
         return this;
     }
 
+    /**
+     * Clears all components from cache.
+     */
     private void clearComponents() {
         buttons.clear();
         items.clear();
+        if (isPaginated) {
+            this.isPaginated = false;
+            currentPaginationPage = 1;
+            maxPaginationPages = 1;
+            paginatedButtons.clear();
+            paginatedItems.clear();
+        }
     }
 
+    /**
+     * Add a clickable button to the GUI.
+     * @param slot The slot to place the button in.
+     * @param button The button to add.
+     * @return The GUI instance.
+     */
     protected GUI<?> addButton(final int slot, final Button button) {
         buttons.put(slot,button);
         return this;
     }
 
+    /**
+     * Add a non-clickable item to the GUI.
+     * @param slot The slot to place the item in.
+     * @param item The item to add.
+     * @return The GUI instance.
+     */
     protected GUI<?> addItem(final int slot, final ItemStack item) {
         items.put(slot,item);
+        return this;
+    }
+
+    /**
+     * Add a paginated non-clickable item to the GUI. Use this if you wish to use paginated items on a page.<br>
+     * <br>
+     * This can be combined and mixed with link@addPaginatedButton
+     * @param item Item to add.
+     * @return The GUI instance.
+     */
+    protected GUI<?> addPaginatedItem(final ItemStack item) {
+        this.paginatedItems.add(item);
+        return this;
+    }
+
+    /**
+     * Add a paginated clickable button to the GUI. Use this if you wish to use paginated buttons on a page.<br>
+     * <br>
+     * This can be combined and mixed with link@addPaginatedItem
+     * @param button Button to add.
+     * @return The GUI instance.
+     */
+    protected GUI<?> addPaginatedItem(final Button button) {
+        this.paginatedItems.add(button);
         return this;
     }
 
@@ -240,6 +326,82 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     protected GUI<?> setFiller(final Filler filler) {
         this.filler = filler;
         return this;
+    }
+
+    protected GUI<?> enablePagination() {
+        return enablePagination(0, inventory.getSize() > 9 ? inventory.getSize() - 9 : 9);
+    }
+
+    protected GUI<?> enablePagination(final int startSlot, final int endSlot) {
+        return enablePagination(startSlot,endSlot, inventory.getSize() - 4, inventory.getSize() - 6);
+    }
+
+    protected GUI<?> enablePagination(final int startSlot, final int endSlot, final int previousPageButtonSlot, final int nextPageButtonSlot) {
+        return enablePagination(startSlot,endSlot,previousPageButtonSlot,nextPageButtonSlot,Material.ARROW,Material.ARROW);
+    }
+
+    protected GUI<?> enablePagination(final int startSlot, final int endSlot, final int previousPageButtonSlot, final int nextPageButtonSlot, final Material previousPageButtonMaterial, final Material nextPageButtonMaterial) {
+        this.isPaginated = true;
+        this.paginationStartSlot = startSlot;
+        this.paginationEndSlot = endSlot;
+        this.previousPageButtonSlot =  previousPageButtonSlot;
+        this.nextPageButtonSlot = nextPageButtonSlot;
+        this.previousPageMaterial = previousPageButtonMaterial;
+        this.nextPageMaterial = nextPageButtonMaterial;
+        return this;
+    }
+
+    protected GUI<?> setHideTooltipOnPageButtons(final boolean enable) {
+        this.hideTooltipsOnPageButtons = enable;
+        return this;
+    }
+
+    protected GUI<?> setPreviousPageButtonTitle(final String title) {
+        this.previousPaginatedPageItemTitle = title;
+        return this;
+    }
+
+    protected GUI<?> setPreviousPageButtonLore(final String...lore) {
+        this.previousPaginatedPageItemLore = Arrays.asList(lore);
+        return this;
+    }
+
+    protected GUI<?> setNextPageButtonTitle(final String title) {
+        this.nextPaginatedPageItemTitle = title;
+        return this;
+    }
+
+    protected GUI<?> setNextPageButtonLore(final String...lore) {
+        this.nextPaginatedPageItemLore = Arrays.asList(lore);
+        return this;
+    }
+
+    private Button createPreviousPageButton() {
+        final ItemStack item = new ItemStack(this.previousPageMaterial);
+        if (hideTooltipsOnPageButtons) {
+            ItemUtil.setHideTooltip(item, true);
+        } else {
+            ItemUtil.setName(item, previousPaginatedPageItemTitle);
+            ItemUtil.setLore(item, previousPaginatedPageItemLore);
+        }
+        return Button.create(item, e -> {
+            if (--currentPaginationPage < 1) currentPaginationPage = 1;
+            renderPage();
+        });
+    }
+
+    private Button createNextPageButton() {
+        final ItemStack item = new ItemStack(this.nextPageMaterial);
+        if (hideTooltipsOnPageButtons) {
+            ItemUtil.setHideTooltip(item, true);
+        } else {
+            ItemUtil.setName(item, this.nextPaginatedPageItemTitle);
+            ItemUtil.setLore(item, this.nextPaginatedPageItemLore);
+        }
+        return Button.create(item, e -> {
+            if (++currentPaginationPage > maxPaginationPages) currentPaginationPage = maxPaginationPages;
+            renderPage();
+        });
     }
 
     /**
