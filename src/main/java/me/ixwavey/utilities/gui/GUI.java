@@ -368,7 +368,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     }
 
     protected GUI<?> enablePagination(final int startSlot, final int endSlot) {
-        return enablePagination(startSlot, endSlot, inventory.getSize() - 4, inventory.getSize() - 6);
+        return enablePagination(startSlot, endSlot, inventory.getSize() - 6, inventory.getSize() - 4);
     }
 
     protected GUI<?> enablePagination(final int startSlot, final int endSlot, final int previousPageButtonSlot, final int nextPageButtonSlot) {
