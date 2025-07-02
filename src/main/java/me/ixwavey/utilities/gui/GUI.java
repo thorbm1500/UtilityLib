@@ -34,6 +34,7 @@ import java.util.*;
  * To set up a page for pagination, use the {@link GUI#enablePagination()}
  *
  * @param <E> An Enum containing a title of each page used in your GUI.
+ * @apiNote Inspired by Wonkglorg's GUI-Library
  */
 @SuppressWarnings("unused")
 public abstract class GUI<E extends Enum<E>> implements Listener {

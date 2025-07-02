@@ -41,7 +41,7 @@ public class ItemUtil {
 
     private static String removeDefaultFormat(final String text) {
         if (!text.contains("<!italic>") && !text.contains("<italic>")) {
-            return "%s%s".formatted("<!italic>", text);
+            return "<!italic>%s".formatted(text.replaceAll("<reset>","<reset><!italic>"));
         }
         return text;
     }
