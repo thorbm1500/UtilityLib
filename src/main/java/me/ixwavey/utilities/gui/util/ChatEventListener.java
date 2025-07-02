@@ -20,6 +20,6 @@ public class ChatEventListener implements Listener {
         e.setCancelled(true);
         gui.activeTextInput.onMessage(e);
         HandlerList.unregisterAll(this);
-        gui.open();
+        gui.open(true);
     }
 }
