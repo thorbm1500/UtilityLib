@@ -150,9 +150,9 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
         this.player = player;
         this.uuid = player.getUniqueId();
         this.pages = new EnumMap<>(enumClass);
-        newInstance();
         this.inventory = title == null ? Bukkit.createInventory(player, size.get()) : Bukkit.createInventory(player, size.get(), MiniMessage.miniMessage().deserialize(title));
         this.filler = filler == null ? this.filler : filler;
+        newInstance();
     }
 
     /**
@@ -169,14 +169,11 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Renders the current page to the screen. This is used automatically and should not be needed to be called manually.
-     *
-     * @return The GUI instance.
      * @throws IllegalStateException In case no pages have been registered.
      */
-    protected GUI<?> renderPage() throws IllegalStateException {
-        if (page == null)
-            throw new IllegalStateException("No pages has been registered. The menu relies on pages, and will not function without defining the pages to render.");
+    private void renderPage() {
         fill();
+        if (page == null) return;
         if (isPaginated) {
             if (paginatedItems.isEmpty()) {
                 this.pages.get(this.page).run();
@@ -208,7 +205,6 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
                 inventory.setItem(index.getKey(), index.getValue());
             }
         }
-        return this;
     }
 
     /**
@@ -446,13 +442,11 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Used to cache the new instance of the GUI.
-     *
-     * @return The GUI instance.
      */
-    private GUI<?> newInstance() {
+    private void newInstance() {
         if (instances.containsKey(this.uuid)) instances.get(this.uuid).destroy();
         instances.put(uuid, this);
-        return this;
+        initializeGUI();
     }
 
     /**
@@ -463,6 +457,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     protected GUI<?> open() {
         registerListeners();
         player.openInventory(inventory);
+        if (page == null && !pages.isEmpty()) changePage(pages.keySet().iterator().next());
         return this;
     }
 
