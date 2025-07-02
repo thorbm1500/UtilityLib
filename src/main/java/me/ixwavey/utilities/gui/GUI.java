@@ -251,7 +251,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
         if (isPaginated) {
             this.isPaginated = false;
             currentPaginationPage = 1;
-            maxPaginationPages = 1;
+            maxPaginationPages = 0;
             paginatedButtons.clear();
             paginatedItems.clear();
         }
