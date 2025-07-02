@@ -67,7 +67,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     private int paginationStartSlot;
     private int paginationEndSlot;
     private int currentPaginationPage = 1;
-    private int maxPaginationPages = 1;
+    private int maxPaginationPages = 0;
     private Material nextPageMaterial;
     private Material previousPageMaterial;
     private int previousPageButtonSlot;
@@ -174,11 +174,10 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     private void renderPage() {
         fill();
         if (page == null) return;
+        if (!isPaginated) this.pages.get(this.page).run();
         if (isPaginated) {
-            if (paginatedItems.isEmpty()) {
-                this.pages.get(this.page).run();
-                this.maxPaginationPages = paginatedItems.size() / ((paginationEndSlot + 1) - (paginationStartSlot + 1));
-            }
+            if (paginatedItems.isEmpty()) this.pages.get(this.page).run();
+            if (maxPaginationPages == 0) this.maxPaginationPages = paginatedItems.size() / ((paginationEndSlot + 1) - (paginationStartSlot + 1));
             this.paginatedButtons.clear();
             int i = (currentPaginationPage - 1) * ((paginationEndSlot + 1) - (paginationStartSlot + 1));
             for (int slot = paginationStartSlot; slot < paginationEndSlot && paginatedItems.size() > i; slot++) {
