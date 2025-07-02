@@ -462,14 +462,24 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Opens the GUI for the Player.
+     * @param callNewRender Whether to render the page on new, to show changes.
+     * @return The GUI instance.
+     */
+    public GUI<?> open(final boolean callNewRender) {
+        registerListeners();
+        player.openInventory(inventory);
+        if (page == null && !pages.isEmpty()) changePage(pages.keySet().iterator().next());
+        else if (callNewRender) renderPage();
+        return this;
+    }
+
+    /**
+     * Opens the GUI for the Player.
      *
      * @return The GUI instance.
      */
     public GUI<?> open() {
-        registerListeners();
-        player.openInventory(inventory);
-        if (page == null && !pages.isEmpty()) changePage(pages.keySet().iterator().next());
-        return this;
+        return open(false);
     }
 
     /**
