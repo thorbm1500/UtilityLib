@@ -454,7 +454,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
      *
      * @return The GUI instance.
      */
-    protected GUI<?> open() {
+    public GUI<?> open() {
         registerListeners();
         player.openInventory(inventory);
         if (page == null && !pages.isEmpty()) changePage(pages.keySet().iterator().next());
