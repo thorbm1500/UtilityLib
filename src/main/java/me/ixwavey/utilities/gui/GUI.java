@@ -32,6 +32,7 @@ import java.util.*;
  * <br><br>
  * The GUI also supports paginated pages, where each paginated item is added with {@link GUI#addPaginatedItem(ItemStack)} and {@link GUI#addPaginatedItem(Button)} respectively.
  * To set up a page for pagination, use the {@link GUI#enablePagination()}
+ *
  * @param <E> An Enum containing a title of each page used in your GUI.
  */
 @SuppressWarnings("unused")
@@ -169,6 +170,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Renders the current page to the screen. This is used automatically and should not be needed to be called manually.
+     *
      * @throws IllegalStateException In case no pages have been registered.
      */
     private void renderPage() {
@@ -177,7 +179,8 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
         if (!isPaginated) this.pages.get(this.page).run();
         if (isPaginated) {
             if (paginatedItems.isEmpty()) this.pages.get(this.page).run();
-            if (maxPaginationPages == 0) this.maxPaginationPages = paginatedItems.size() / ((paginationEndSlot + 1) - (paginationStartSlot + 1));
+            if (maxPaginationPages == 0)
+                this.maxPaginationPages = paginatedItems.size() / ((paginationEndSlot + 1) - (paginationStartSlot + 1));
             this.paginatedButtons.clear();
             int i = (currentPaginationPage - 1) * ((paginationEndSlot + 1) - (paginationStartSlot + 1));
             for (int slot = paginationStartSlot; slot < paginationEndSlot && paginatedItems.size() > i; slot++) {
@@ -188,21 +191,21 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
                     inventory.setItem(slot, button.getItem());
                     paginatedButtons.put(slot, button);
                 }
+                buttons.remove(slot);
+                items.remove(slot);
                 i++;
             }
             paginatedButtons.put(previousPageButtonSlot, createPreviousPageButton());
             paginatedButtons.put(nextPageButtonSlot, createNextPageButton());
             inventory.setItem(previousPageButtonSlot, paginatedButtons.get(previousPageButtonSlot).getItem());
             inventory.setItem(nextPageButtonSlot, paginatedButtons.get(nextPageButtonSlot).getItem());
-        } else {
-            this.pages.get(this.page).run();
-            for (var index : buttons.entrySet()) {
-                inventory.setItem(index.getKey(), index.getValue().getItem());
-                items.remove(index.getKey());
-            }
-            for (var index : items.entrySet()) {
-                inventory.setItem(index.getKey(), index.getValue());
-            }
+        }
+        for (var index : buttons.entrySet()) {
+            inventory.setItem(index.getKey(), index.getValue().getItem());
+            items.remove(index.getKey());
+        }
+        for (var index : items.entrySet()) {
+            inventory.setItem(index.getKey(), index.getValue());
         }
     }
 
