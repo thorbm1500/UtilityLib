@@ -520,8 +520,12 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
         if (event.getClick() == ClickType.DOUBLE_CLICK) return;
 
         final int slot = event.getRawSlot();
-        final Button button = isPaginated ? paginatedButtons.get(slot) : buttons.get(slot);
+        Button button = buttons.get(slot);
         if (button != null) button.onClick(event);
+        else if (isPaginated) {
+            button = paginatedButtons.get(slot);
+            if (button != null) button.onClick(event);
+        }
     }
 
     @EventHandler
