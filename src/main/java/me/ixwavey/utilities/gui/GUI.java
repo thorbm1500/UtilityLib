@@ -180,7 +180,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
         if (isPaginated) {
             if (paginatedItems.isEmpty()) this.pages.get(this.page).run();
             if (maxPaginationPages == 0)
-                this.maxPaginationPages = paginatedItems.size() / ((paginationEndSlot + 1) - (paginationStartSlot + 1));
+                this.maxPaginationPages = paginatedItems.size() % ((paginationEndSlot + 1) - (paginationStartSlot + 1)) != 0 ? (paginatedItems.size() / ((paginationEndSlot + 1) - (paginationStartSlot + 1))) + 1 : paginatedItems.size() / ((paginationEndSlot + 1) - (paginationStartSlot + 1));
             this.paginatedButtons.clear();
             int i = (currentPaginationPage - 1) * ((paginationEndSlot + 1) - (paginationStartSlot + 1));
             for (int slot = paginationStartSlot; slot < paginationEndSlot && paginatedItems.size() > i; slot++) {
