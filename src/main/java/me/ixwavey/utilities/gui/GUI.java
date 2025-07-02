@@ -1,8 +1,7 @@
 package me.ixwavey.utilities.gui;
 
-import me.ixwavey.utilities.gui.util.Button;
-import me.ixwavey.utilities.gui.util.Filler;
-import me.ixwavey.utilities.gui.util.InventorySize;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import me.ixwavey.utilities.gui.util.*;
 import me.ixwavey.utilities.item.ItemUtil;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -49,7 +48,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     //Instance
     protected final Player player;
-    protected final UUID uuid;
+    public final UUID uuid;
     private final Plugin plugin;
     private final Inventory inventory;
     private E page;
@@ -57,6 +56,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     private final Stack<E> history = new Stack<>();
     private final HashMap<Integer, Button> buttons = new HashMap<>();
     private final HashMap<Integer, ItemStack> items = new HashMap<>();
+    public TextInput activeTextInput = null;
 
     //GUI Settings
     private Filler filler = Filler.BLACK;
@@ -484,6 +484,18 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
             unregisterListeners();
             inventory.close();
         }
+        return this;
+    }
+
+    /**
+     * Closes the GUI and listens for the next ChatInput made by the Player connected to the GUI.
+     * @param listener The {@link TextInput} that should handle the event.
+     * @return The GUI instance.
+     */
+    protected GUI<?> closeAndListen(final TextInput listener) {
+        close(false);
+        this.activeTextInput = listener;
+        Bukkit.getPluginManager().registerEvents(new ChatEventListener(this), plugin);
         return this;
     }
 
