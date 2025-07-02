@@ -17,6 +17,7 @@ public class ChatEventListener implements Listener {
     @EventHandler
     public void onChat(AsyncChatEvent e) {
         if (!e.getPlayer().getUniqueId().equals(gui.uuid)) return;
+        e.setCancelled(true);
         gui.activeTextInput.onMessage(e);
         HandlerList.unregisterAll(this);
         gui.open();
