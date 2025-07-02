@@ -195,10 +195,14 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
                 items.remove(slot);
                 i++;
             }
-            buttons.put(previousPageButtonSlot, createPreviousPageButton());
-            buttons.put(nextPageButtonSlot, createNextPageButton());
-            inventory.setItem(previousPageButtonSlot, buttons.get(previousPageButtonSlot).getItem());
-            inventory.setItem(nextPageButtonSlot, buttons.get(nextPageButtonSlot).getItem());
+            if (currentPaginationPage > 1) {
+                buttons.put(previousPageButtonSlot, createPreviousPageButton());
+                inventory.setItem(previousPageButtonSlot, buttons.get(previousPageButtonSlot).getItem());
+            }
+            if (currentPaginationPage < maxPaginationPages) {
+                buttons.put(nextPageButtonSlot, createNextPageButton());
+                inventory.setItem(nextPageButtonSlot, buttons.get(nextPageButtonSlot).getItem());
+            }
         }
         for (var index : buttons.entrySet()) {
             inventory.setItem(index.getKey(), index.getValue().getItem());
