@@ -195,10 +195,10 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
                 items.remove(slot);
                 i++;
             }
-            paginatedButtons.put(previousPageButtonSlot, createPreviousPageButton());
-            paginatedButtons.put(nextPageButtonSlot, createNextPageButton());
-            inventory.setItem(previousPageButtonSlot, paginatedButtons.get(previousPageButtonSlot).getItem());
-            inventory.setItem(nextPageButtonSlot, paginatedButtons.get(nextPageButtonSlot).getItem());
+            buttons.put(previousPageButtonSlot, createPreviousPageButton());
+            buttons.put(nextPageButtonSlot, createNextPageButton());
+            inventory.setItem(previousPageButtonSlot, buttons.get(previousPageButtonSlot).getItem());
+            inventory.setItem(nextPageButtonSlot, buttons.get(nextPageButtonSlot).getItem());
         }
         for (var index : buttons.entrySet()) {
             inventory.setItem(index.getKey(), index.getValue().getItem());
@@ -520,7 +520,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
         if (event.getClick() == ClickType.DOUBLE_CLICK) return;
 
         final int slot = event.getRawSlot();
-        final Button button = buttons.get(slot);
+        final Button button = isPaginated ? paginatedButtons.get(slot) : buttons.get(slot);
         if (button != null) button.onClick(event);
     }
 
