@@ -24,11 +24,26 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+/**
+ * Create inventory GUIs easy and fast.
+ * <br><br>
+ * Register your pages by using the {@link GUI#registerPage(Enum, Runnable)},
+ * where the Runnable is a method where all items and buttons are defined and added using the {@link GUI#addItem(int, ItemStack)} and {@link GUI#addButton(int, Button)}.
+ * <br><br>
+ * The GUI also supports paginated pages, where each paginated item is added with {@link GUI#addPaginatedItem(ItemStack)} and {@link GUI#addPaginatedItem(Button)} respectively.
+ * To set up a page for pagination, use the {@link GUI#enablePagination()}
+ * @param <E> An Enum containing a title of each page used in your GUI.
+ */
 @SuppressWarnings("unused")
 public abstract class GUI<E extends Enum<E>> implements Listener {
 
     //Management
     private static final HashMap<UUID, GUI<?>> instances = new HashMap<>();
+
+    /**
+     * Define settings and register pages.
+     */
+    protected abstract void initializeGUI();
 
     //Instance
     protected final Player player;
@@ -63,7 +78,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     private List<String> nextPaginatedPageItemLore = List.of("<gray>Click to change page.");
     private boolean hideTooltipsOnPageButtons = false;
     private final List<Object> paginatedItems = new ArrayList<>();
-    private final HashMap<Integer,Button> paginatedButtons = new HashMap<>();
+    private final HashMap<Integer, Button> paginatedButtons = new HashMap<>();
 
     /**
      * Creates a new GUI instance with a medium size.
@@ -142,22 +157,25 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Register pages to the menu.
-     * @param page The Enum of the Page to register.
+     *
+     * @param page     The Enum of the Page to register.
      * @param runnable The method attached to the page, for rendering its components.
      * @return The GUI instance.
      */
     protected GUI<?> registerPage(E page, @NotNull Runnable runnable) {
-        this.pages.put(page,runnable);
+        this.pages.put(page, runnable);
         return this;
     }
 
     /**
      * Renders the current page to the screen. This is used automatically and should not be needed to be called manually.
+     *
      * @return The GUI instance.
-     * @throws IllegalStateException In case no pages has been registered.
+     * @throws IllegalStateException In case no pages have been registered.
      */
     protected GUI<?> renderPage() throws IllegalStateException {
-        if (page == null) throw new IllegalStateException("No pages has been registered. The menu relies on pages, and will not function without defining the pages to render.");
+        if (page == null)
+            throw new IllegalStateException("No pages has been registered. The menu relies on pages, and will not function without defining the pages to render.");
         fill();
         if (isPaginated) {
             if (paginatedItems.isEmpty()) {
@@ -194,7 +212,19 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     }
 
     /**
+     * Renders the previous page in the history.
+     * Can be called at any time, and will only change and render a new page if one is found in history.
+     *
+     * @return The GUI instance.
+     */
+    protected GUI<?> changePageToPrevious() {
+        if (!history.empty()) changePage(history.removeLast());
+        return this;
+    }
+
+    /**
      * Changes the current page and updates the GUI to show the new page.
+     *
      * @param page Page to update to.
      * @return The GUI instance.
      */
@@ -223,23 +253,25 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Add a clickable button to the GUI.
-     * @param slot The slot to place the button in.
+     *
+     * @param slot   The slot to place the button in.
      * @param button The button to add.
      * @return The GUI instance.
      */
     protected GUI<?> addButton(final int slot, final Button button) {
-        buttons.put(slot,button);
+        buttons.put(slot, button);
         return this;
     }
 
     /**
      * Add a non-clickable item to the GUI.
+     *
      * @param slot The slot to place the item in.
      * @param item The item to add.
      * @return The GUI instance.
      */
     protected GUI<?> addItem(final int slot, final ItemStack item) {
-        items.put(slot,item);
+        items.put(slot, item);
         return this;
     }
 
@@ -247,6 +279,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
      * Add a paginated non-clickable item to the GUI. Use this if you wish to use paginated items on a page.<br>
      * <br>
      * This can be combined and mixed with link@addPaginatedButton
+     *
      * @param item Item to add.
      * @return The GUI instance.
      */
@@ -259,6 +292,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
      * Add a paginated clickable button to the GUI. Use this if you wish to use paginated buttons on a page.<br>
      * <br>
      * This can be combined and mixed with link@addPaginatedItem
+     *
      * @param button Button to add.
      * @return The GUI instance.
      */
@@ -269,6 +303,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Fills the inventory with the filler item.
+     *
      * @return The GUI instance.
      */
     protected GUI<?> fill() {
@@ -277,8 +312,9 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Fills a specific part of the GUI with the filler item.
+     *
      * @param start Start slot of the fill area.
-     * @param end End slot of the fill area.
+     * @param end   End slot of the fill area.
      * @return The GUI instance.
      */
     protected GUI<?> fill(final int start, final int end) {
@@ -290,6 +326,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Sets whether the Player is allowed to pick up items while the GUI is active and opened.
+     *
      * @param allow True | False
      * @return The GUI instance.
      */
@@ -299,7 +336,8 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     }
 
     /**
-     * Sets whether the Player is allowed to quick-close the GUI by e.g. pressing the escape button.
+     * Sets whether the Player is allowed to quick-close the GUI by e.g., pressing the escape button.
+     *
      * @param allow True | False
      * @return The GUI instance.
      */
@@ -310,6 +348,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Sets whether the GUI instance should be destroyed when closed by the Player.
+     *
      * @param destroy True | False
      * @return The GUI instance.
      */
@@ -320,6 +359,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Updates the filler item of the GUI to the new given Filler.
+     *
      * @param filler Filler to update to.
      * @return The GUI instance.
      */
@@ -333,18 +373,18 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     }
 
     protected GUI<?> enablePagination(final int startSlot, final int endSlot) {
-        return enablePagination(startSlot,endSlot, inventory.getSize() - 4, inventory.getSize() - 6);
+        return enablePagination(startSlot, endSlot, inventory.getSize() - 4, inventory.getSize() - 6);
     }
 
     protected GUI<?> enablePagination(final int startSlot, final int endSlot, final int previousPageButtonSlot, final int nextPageButtonSlot) {
-        return enablePagination(startSlot,endSlot,previousPageButtonSlot,nextPageButtonSlot,Material.ARROW,Material.ARROW);
+        return enablePagination(startSlot, endSlot, previousPageButtonSlot, nextPageButtonSlot, Material.ARROW, Material.ARROW);
     }
 
     protected GUI<?> enablePagination(final int startSlot, final int endSlot, final int previousPageButtonSlot, final int nextPageButtonSlot, final Material previousPageButtonMaterial, final Material nextPageButtonMaterial) {
         this.isPaginated = true;
         this.paginationStartSlot = startSlot;
         this.paginationEndSlot = endSlot;
-        this.previousPageButtonSlot =  previousPageButtonSlot;
+        this.previousPageButtonSlot = previousPageButtonSlot;
         this.nextPageButtonSlot = nextPageButtonSlot;
         this.previousPageMaterial = previousPageButtonMaterial;
         this.nextPageMaterial = nextPageButtonMaterial;
@@ -361,7 +401,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
         return this;
     }
 
-    protected GUI<?> setPreviousPageButtonLore(final String...lore) {
+    protected GUI<?> setPreviousPageButtonLore(final String... lore) {
         this.previousPaginatedPageItemLore = Arrays.asList(lore);
         return this;
     }
@@ -371,7 +411,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
         return this;
     }
 
-    protected GUI<?> setNextPageButtonLore(final String...lore) {
+    protected GUI<?> setNextPageButtonLore(final String... lore) {
         this.nextPaginatedPageItemLore = Arrays.asList(lore);
         return this;
     }
@@ -406,6 +446,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Used to cache the new instance of the GUI.
+     *
      * @return The GUI instance.
      */
     private GUI<?> newInstance() {
@@ -416,6 +457,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Opens the GUI for the Player.
+     *
      * @return The GUI instance.
      */
     protected GUI<?> open() {
@@ -426,6 +468,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Closes the GUI for the Player.
+     *
      * @param destroy Whether the GUI should destroy itself when closed.
      * @return The GUI instance.
      */
@@ -439,10 +482,12 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     }
 
     /**
-     * Destroys the GUI instance and removes the instance and UUID from cache.
+     * Destroys the GUI instance and removes the instance and UUID from the cache.
+     *
      * @return Whether the listeners were successfully unregistered.
      */
     protected boolean destroy() {
+        inventory.close();
         instances.remove(uuid);
         return unregisterListeners();
     }
@@ -458,6 +503,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Unregisters the listeners for the GUI instance.
+     *
      * @return Whether the unregistration was successful.
      */
     private boolean unregisterListeners() {
@@ -509,10 +555,18 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
 
     /**
      * Get an active GUI instance for a given Player.
+     *
      * @param player The Player.
      * @return The GUI instance if one was found, otherwise null.
      */
-    public static GUI<?> hasGUIInstance(final Player player) {
+    public static GUI<?> hasActiveInstance(final Player player) {
         return instances.getOrDefault(player.getUniqueId(), null);
+    }
+
+    /**
+     * Destroys every active instance in cache.
+     */
+    public static void cleanup() {
+        instances.forEach((uuid1, gui) -> gui.destroy());
     }
 }
