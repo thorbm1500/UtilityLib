@@ -1,6 +1,5 @@
 package me.ixwavey.utilities.gui;
 
-import io.papermc.paper.event.player.AsyncChatEvent;
 import me.ixwavey.utilities.gui.util.*;
 import me.ixwavey.utilities.item.ItemUtil;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -469,7 +468,11 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
         registerListeners();
         player.openInventory(inventory);
         if (page == null && !pages.isEmpty()) changePage(pages.keySet().iterator().next());
-        else if (callNewRender) renderPage();
+        else if (callNewRender) {
+            clearComponents();
+            this.pages.get(page).run();
+            renderPage();
+        }
         return this;
     }
 
