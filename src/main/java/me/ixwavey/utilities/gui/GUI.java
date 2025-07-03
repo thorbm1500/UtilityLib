@@ -224,7 +224,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
      * @return The GUI instance.
      */
     protected GUI<?> changePageToPrevious() {
-        if (!history.empty()) changePage(history.removeLast());
+        if (!history.empty()) changePage(history.removeLast(), false);
         return this;
     }
 
@@ -235,7 +235,18 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
      * @return The GUI instance.
      */
     protected GUI<?> changePage(final E page) {
-        history.add(this.page);
+        return changePage(page, true);
+    }
+
+    /**
+     * Changes the current page and updates the GUI to show the new page.
+     *
+     * @param page Page to update to.
+     * @param addToHistory Whether to add the new page to the history.
+     * @return The GUI instance.
+     */
+    protected GUI<?> changePage(final E page, final boolean addToHistory) {
+        if (addToHistory) history.add(this.page);
         this.page = page;
         clearComponents();
         renderPage();
