@@ -269,10 +269,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
     }
 
     protected GUI<?> callNewRender() {
-        clearComponents();
-        pages.get(this.page).run();
-        renderPage();
-        return this;
+        return changePage(page,false);
     }
 
     /**
