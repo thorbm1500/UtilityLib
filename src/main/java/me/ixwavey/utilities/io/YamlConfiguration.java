@@ -182,10 +182,10 @@ public abstract class YamlConfiguration {
      * Overwrite or add data to the file. If a given value is null, the entry in the file will be removed.
      *
      * @param path  Path in the file.
-     * @param value Values to write
+     * @param value Map containing children with a value to write attached to each.
      */
-    protected void set(@NotNull final String path, @NotNull final Object... value) {
-        for (final Object o : value) fileConfiguration.set(path, o);
+    protected void set(@NotNull final String path, @NotNull final Map<String,Object> value) {
+        for (final var index : value.entrySet()) fileConfiguration.set(path + index.getKey(), index.getValue());
         save();
     }
 
