@@ -26,7 +26,7 @@ public class Formatter {
      * Get the corresponding Minecraft Small Font character. Accepts a-z & A-Z
      * @param c Char to compare with.
      * @return Character from the Minecraft Small Font.
-     * @throws IllegalArgumentException Should provided char not have a corresponding character.
+     * @throws IllegalArgumentException Should the provided char not have a corresponding character.
      */
     private static char getMinecraftFontChar(final char c)throws IllegalArgumentException {
         return switch(c) {

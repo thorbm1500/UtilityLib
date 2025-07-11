@@ -1,5 +1,6 @@
 package me.ixwavey.utilities.gui.util;
 
+@SuppressWarnings("unused")
 public enum InventorySize {
     TINY(9),
     EXTRA_SMALL(18),
