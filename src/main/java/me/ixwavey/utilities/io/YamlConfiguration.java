@@ -169,12 +169,11 @@ public abstract class YamlConfiguration {
 
         /**
      * Overwrite or add data to the file.<br>
-     * If the given value is null, the entry in the file will be removed.
-     *
+     * To remove an entry, see {@link YamlConfiguration#remove}
      * @param path  Path in the file.
      * @param value Value to write
      */
-    protected void set(@NotNull final String path, @Nullable final Object value) {
+    protected void set(@NotNull final String path, @NotNull final Object value) {
         fileConfiguration.set(path, value);
         save();
     }
@@ -185,9 +184,31 @@ public abstract class YamlConfiguration {
      * @param path  Path in the file.
      * @param value Values to write
      */
-    protected void set(@NotNull final String path, @Nullable final Object... value) {
+    protected void set(@NotNull final String path, @NotNull final Object... value) {
         for (final Object o : value) fileConfiguration.set(path, o);
         save();
+    }
+
+    /**
+     * Remove the entry at the specified path from the configuration file.
+     * @param path Path to the entry.
+     * @return True if the entry was removed, otherwise false if there is no entry at the specified path.
+     */
+    protected boolean remove(@NotNull final String path) {
+        return remove(path, false);
+    }
+
+    /**
+     * Remove the entry at the specified path from the configuration file.
+     * @param path Path to the entry.
+     * @param save True if the file should be saved after removal of entry.
+     * @return True if the entry was removed, otherwise false if there is no entry at the specified path.
+     */
+    protected boolean remove(@NotNull final String path, final boolean save) {
+        if (!contains(path)) return false;
+        fileConfiguration.set(path, null);
+        if (save) save();
+        return true;
     }
 
     protected @NotNull Set<String> getKeys(@NotNull final String path) {
