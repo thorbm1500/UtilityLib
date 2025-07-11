@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.InvalidPathException;
 import java.util.*;
 
 import static org.bukkit.configuration.file.YamlConfiguration.*;
@@ -53,7 +54,6 @@ public abstract class YamlConfiguration {
     /**
      * Saves the file with the current {@link FileConfiguration}.
      * If a file does not already exist, it will be created.
-     * If a file does already exist, it will be overwritten.
      */
     @SneakyThrows
     protected void save() {
@@ -575,12 +575,15 @@ public abstract class YamlConfiguration {
      *
      * @param path Path to get ItemStack from.
      * @return The {@link ItemStack} found.
-     * @throws Exception                If no ItemStack is found.
-     * @throws IllegalArgumentException If the Material defined does not exist or the Material defined is {@link Material#AIR} or if the namespace or key is defined incorrectly in Custom Data Tags.
+     * @throws InvalidPathException     If the configuration file does not contain the path specified.
+     * @throws IllegalArgumentException If the {@link Material} defined does not exist.
+     * @throws IllegalArgumentException If the {@link Material} defined is {@link Material#AIR}
+     * @throws IllegalArgumentException If the {@link NamespacedKey} is defined incorrectly in Custom Data Tags.
+     * @throws IllegalArgumentException If the {@link ItemFlag} defined is invalid.
      * @throws RuntimeException         If the value is defined incorrectly and is unable to be read, for the Custom Data Tags.
      */
-    protected @NotNull ItemStack getItemStack(@NotNull final String path) throws Exception, IllegalArgumentException, RuntimeException {
-        if (!contains(path)) throw new Exception("Invalid path given. No item found!");
+    protected @NotNull ItemStack getItemStack(@NotNull final String path) throws InvalidPathException, IllegalArgumentException, RuntimeException {
+        if (!contains(path)) throw new InvalidPathException(path, "Invalid path given. No item found!");
 
         final Material material = getMaterial(path + ".item");
         if (material == null) throw new IllegalArgumentException("Item type not found: " + getString(path + ".item"));
@@ -681,7 +684,7 @@ public abstract class YamlConfiguration {
                         if (v == null) throw new RuntimeException("Error reading string value for custom data key %s".formatted(k));
                         container.set(new NamespacedKey(namespace,key), PersistentDataType.STRING, v);
                     }
-                    default -> throw new Exception("Invalid tag type: " + getString(k + ".type"));
+                    default -> throw new IllegalArgumentException("Invalid tag type: " + getString(k + ".type"));
                 }
             }
         }
