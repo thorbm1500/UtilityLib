@@ -6,10 +6,7 @@ import io.papermc.paper.registry.RegistryKey;
 import lombok.SneakyThrows;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -189,7 +186,7 @@ public abstract class YamlConfiguration {
         save();
     }
 
-    /**
+        /**
      * Remove the entry at the specified path from the configuration file.
      * @param path Path to the entry.
      * @return True if the entry was removed, otherwise false if there is no entry at the specified path.
@@ -709,6 +706,34 @@ public abstract class YamlConfiguration {
             }
         });
         return list;
+    }
+
+    /**
+     * Get a {@link Sound} from the specified path in the file.
+     *
+     * @param path Path to get Sound from.
+     * @return The Sound found. Returns null if the path does not exist in the File, and no default value was defined,
+     * otherwise returns the default value.
+     */
+    protected Sound getSound(@NotNull final String path) {
+        final String value = getString(path);
+        if (value == null) return null;
+        final NamespacedKey key = NamespacedKey.fromString(value);
+        if (key == null) return null;
+        return Registry.SOUNDS.get(key);
+    }
+
+    /**
+     * Get a {@link Sound} from the specified path in the file.
+     *
+     * @param path Path to get Sound from.
+     * @param def Default value.
+     * @return The Sound found. Returns null if the path does not exist in the File, and no default value was defined,
+     * otherwise returns the default value.
+     */
+    protected Sound getSound(@NotNull final String path, @Nullable final Sound def) {
+        final Sound sound = getSound(path);
+        return sound == null ? def : sound;
     }
 
     /**
