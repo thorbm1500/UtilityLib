@@ -80,7 +80,7 @@ public abstract class YamlConfiguration {
      * @param path Path in file.
      * @return True | False
      */
-    protected boolean contains(@NotNull final String path) {
+    public boolean contains(@NotNull final String path) {
         return options().contains(path);
     }
 
@@ -90,7 +90,7 @@ public abstract class YamlConfiguration {
      * @param children All children to check for.
      * @return True | False
      */
-    protected boolean contains(@NotNull String parent, @NotNull final String... children) {
+    public boolean contains(@NotNull String parent, @NotNull final String... children) {
         if (!parent.endsWith(".")) parent += ".";
         for (final String child : children) {
             if (!options().contains(parent + child)) return false;
@@ -104,7 +104,7 @@ public abstract class YamlConfiguration {
      * @return True if the {@link Object} is an instance of {@link String}, otherwise false.
      * If the path does not exist, false will also be returned.
      */
-    protected boolean isString(@NotNull final String path) {
+    public boolean isString(@NotNull final String path) {
         if (!contains(path)) return false;
         return options().get(path) instanceof String;
     }
@@ -115,7 +115,7 @@ public abstract class YamlConfiguration {
      * @return True if the {@link Object} is an instance of {@link Integer}, otherwise false.
      * If the path does not exist, false will also be returned.
      */
-    protected boolean isInt(@NotNull final String path) {
+    public boolean isInt(@NotNull final String path) {
         if (!contains(path)) return false;
         return options().get(path) instanceof Integer;
     }
@@ -126,7 +126,7 @@ public abstract class YamlConfiguration {
      * @return True if the {@link Object} is an instance of {@link Long}, otherwise false.
      * If the path does not exist, false will also be returned.
      */
-    protected boolean isLong(@NotNull final String path) {
+    public boolean isLong(@NotNull final String path) {
         if (!contains(path)) return false;
         return options().get(path) instanceof Long;
     }
@@ -137,7 +137,7 @@ public abstract class YamlConfiguration {
      * @return True if the {@link Object} is an instance of {@link Float}, otherwise false.
      * If the path does not exist, false will also be returned.
      */
-    protected boolean isFloat(@NotNull final String path) {
+    public boolean isFloat(@NotNull final String path) {
         if (!contains(path)) return false;
         return options().get(path) instanceof Float;
     }
@@ -148,7 +148,7 @@ public abstract class YamlConfiguration {
      * @return True if the {@link Object} is an instance of {@link Double}, otherwise false.
      * If the path does not exist, false will also be returned.
      */
-    protected boolean isDouble(@NotNull final String path) {
+    public boolean isDouble(@NotNull final String path) {
         if (!contains(path)) return false;
         return options().get(path) instanceof Double;
     }
@@ -159,7 +159,7 @@ public abstract class YamlConfiguration {
      * @return True if the {@link Object} is an instance of {@link Boolean}, otherwise false.
      * If the path does not exist, false will also be returned.
      */
-    protected boolean isBoolean(@NotNull final String path) {
+    public boolean isBoolean(@NotNull final String path) {
         if (!contains(path)) return false;
         return options().get(path) instanceof Boolean;
     }
@@ -170,7 +170,7 @@ public abstract class YamlConfiguration {
      * @param path  Path in the file.
      * @param value Value to write
      */
-    protected void set(@NotNull final String path, @NotNull final Object value) {
+    public void set(@NotNull final String path, @NotNull final Object value) {
         fileConfiguration.set(path, value);
         save();
     }
@@ -181,7 +181,7 @@ public abstract class YamlConfiguration {
      * @param path  Path in the file.
      * @param value Map containing children with a value to write attached to each.
      */
-    protected void set(@NotNull final String path, @NotNull final Map<String,Object> value) {
+    public void set(@NotNull final String path, @NotNull final Map<String,Object> value) {
         for (final var index : value.entrySet()) fileConfiguration.set(path + index.getKey(), index.getValue());
         save();
     }
@@ -208,36 +208,36 @@ public abstract class YamlConfiguration {
         return true;
     }
 
-    protected @NotNull Set<String> getKeys(@NotNull final String path) {
+    public @NotNull Set<String> getKeys(@NotNull final String path) {
         return getKeys(path, false);
     }
 
-    protected @Nullable Set<String> getKeys(@NotNull final String path, @Nullable final Set<String> def) {
+    public @Nullable Set<String> getKeys(@NotNull final String path, @Nullable final Set<String> def) {
         return getKeys(path, false, def);
     }
 
-    protected @NotNull Set<String> getKeys(@NotNull final String path, final boolean deep) {
+    public @NotNull Set<String> getKeys(@NotNull final String path, final boolean deep) {
         return getKeys(path, deep, new HashSet<>());
     }
 
-    protected Set<String> getKeys(@NotNull final String path, final boolean deep, final @Nullable Set<String> def) {
+    public Set<String> getKeys(@NotNull final String path, final boolean deep, final @Nullable Set<String> def) {
         if (!contains(path)) return def;
         return options().getConfigurationSection(path).getKeys(deep);
     }
 
-    protected @NotNull Map<String, Object> getValues(@NotNull final String path) {
+    public @NotNull Map<String, Object> getValues(@NotNull final String path) {
         return getValues(path, false, new HashMap<>());
     }
 
-    protected Map<String, Object> getValues(@NotNull final String path, @Nullable final Map<String, Object> def) {
+    public Map<String, Object> getValues(@NotNull final String path, @Nullable final Map<String, Object> def) {
         return getValues(path, false, def);
     }
 
-    protected @NotNull Map<String, Object> getValues(@NotNull final String path, final boolean deep) {
+    public @NotNull Map<String, Object> getValues(@NotNull final String path, final boolean deep) {
         return getValues(path, deep, new HashMap<>());
     }
 
-    protected Map<String, Object> getValues(@NotNull final String path, final boolean deep, @Nullable final Map<String, Object> def) {
+    public Map<String, Object> getValues(@NotNull final String path, final boolean deep, @Nullable final Map<String, Object> def) {
         if (!contains(path)) return def;
         return options().getConfigurationSection(path).getValues(deep);
     }
@@ -250,7 +250,7 @@ public abstract class YamlConfiguration {
      * @return The String found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected String getString(@NotNull final String path) {
+    public String getString(@NotNull final String path) {
         if (!contains(path)) return null;
         return options().getString(path);
     }
@@ -263,7 +263,7 @@ public abstract class YamlConfiguration {
      * @return The String found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected String getString(@NotNull final String path, @Nullable final String def) {
+    public String getString(@NotNull final String path, @Nullable final String def) {
         final String value = getString(path);
         return value == null ? def : value;
     }
@@ -275,7 +275,7 @@ public abstract class YamlConfiguration {
      * @return The String found as {@link Component}. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Component getComponent(@NotNull final String path) {
+    public Component getComponent(@NotNull final String path) {
         final String value = getString(path);
         return value == null ? null : MiniMessage.miniMessage().deserialize(value);
     }
@@ -288,7 +288,7 @@ public abstract class YamlConfiguration {
      * @return The String found as {@link Component}. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Component getComponent(@NotNull final String path, @Nullable final String def) {
+    public Component getComponent(@NotNull final String path, @Nullable final String def) {
         return MiniMessage.miniMessage().deserialize(getString(path, def));
     }
 
@@ -299,7 +299,7 @@ public abstract class YamlConfiguration {
      * @return The String List found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected List<String> getStringList(@NotNull final String path) {
+    public List<String> getStringList(@NotNull final String path) {
         if (!contains(path)) return null;
         return options().getStringList(path);
     }
@@ -312,7 +312,7 @@ public abstract class YamlConfiguration {
      * @return The String List found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected List<String> getStringList(@NotNull final String path, @Nullable final List<String> def) {
+    public List<String> getStringList(@NotNull final String path, @Nullable final List<String> def) {
         final List<String> value = getStringList(path);
         return value == null ? def : value;
     }
@@ -324,7 +324,7 @@ public abstract class YamlConfiguration {
      * @return The Component List found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected List<Component> getComponentList(@NotNull final String path) {
+    public List<Component> getComponentList(@NotNull final String path) {
         final List<String> value = getStringList(path);
         if (value == null) return null;
 
@@ -341,7 +341,7 @@ public abstract class YamlConfiguration {
      * @return The Component List found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected List<Component> getComponentList(@NotNull final String path, @Nullable final List<Component> def) {
+    public List<Component> getComponentList(@NotNull final String path, @Nullable final List<Component> def) {
         final List<Component> value = getComponentList(path);
         return value == null ? def : value;
     }
@@ -353,7 +353,7 @@ public abstract class YamlConfiguration {
      * @return The Byte found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Byte getByte(@NotNull final String path) {
+    public Byte getByte(@NotNull final String path) {
         if (!contains(path)) return null;
         return options().get(path) instanceof Byte b ? b : null;
     }
@@ -366,7 +366,7 @@ public abstract class YamlConfiguration {
      * @return The Byte found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Byte getByte(@NotNull final String path, final byte def) {
+    public Byte getByte(@NotNull final String path, final byte def) {
         final Byte value = getByte(path);
         return value == null ? def : value;
     }
@@ -378,7 +378,7 @@ public abstract class YamlConfiguration {
      * @return The Integer found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Integer getInt(@NotNull final String path) {
+    public Integer getInt(@NotNull final String path) {
         if (!contains(path)) return null;
         return options().getInt(path);
     }
@@ -391,7 +391,7 @@ public abstract class YamlConfiguration {
      * @return The Integer found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Integer getInt(@NotNull final String path, final int def) {
+    public Integer getInt(@NotNull final String path, final int def) {
         final Integer value = getInt(path);
         return value == null ? def : value;
     }
@@ -403,7 +403,7 @@ public abstract class YamlConfiguration {
      * @return The Long found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Long getLong(@NotNull final String path) {
+    public Long getLong(@NotNull final String path) {
         if (!contains(path)) return null;
         return options().getLong(path);
     }
@@ -416,7 +416,7 @@ public abstract class YamlConfiguration {
      * @return The Long found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Long getLong(@NotNull final String path, final long def) {
+    public Long getLong(@NotNull final String path, final long def) {
         final Long value = getLong(path);
         return value == null ? def : value;
     }
@@ -428,7 +428,7 @@ public abstract class YamlConfiguration {
      * @return The Float found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Float getFloat(@NotNull final String path) {
+    public Float getFloat(@NotNull final String path) {
         if (!contains(path)) return null;
         return (float) options().getDouble(path);
     }
@@ -441,7 +441,7 @@ public abstract class YamlConfiguration {
      * @return The Float found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Float getFloat(@NotNull final String path, final float def) {
+    public Float getFloat(@NotNull final String path, final float def) {
         final Float value = getFloat(path);
         return value == null ? def : value;
     }
@@ -453,7 +453,7 @@ public abstract class YamlConfiguration {
      * @return The Double found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Double getDouble(@NotNull final String path) {
+    public Double getDouble(@NotNull final String path) {
         if (!contains(path)) return null;
         return options().getDouble(path);
     }
@@ -466,7 +466,7 @@ public abstract class YamlConfiguration {
      * @return The Double found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Double getDouble(@NotNull final String path, final double def) {
+    public Double getDouble(@NotNull final String path, final double def) {
         final Double value = getDouble(path);
         return value == null ? def : value;
     }
@@ -478,7 +478,7 @@ public abstract class YamlConfiguration {
      * @return The Boolean found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Boolean getBoolean(@NotNull final String path) {
+    public Boolean getBoolean(@NotNull final String path) {
         if (!contains(path)) return null;
         return options().getBoolean(path);
     }
@@ -491,7 +491,7 @@ public abstract class YamlConfiguration {
      * @return The Boolean found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Boolean getBoolean(@NotNull final String path, final boolean def) {
+    public Boolean getBoolean(@NotNull final String path, final boolean def) {
         final Boolean value = getBoolean(path);
         return value == null ? def : value;
     }
@@ -503,7 +503,7 @@ public abstract class YamlConfiguration {
      * @return The Material found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Material getMaterial(@NotNull final String path) {
+    public Material getMaterial(@NotNull final String path) {
         final String value = getString(path);
         if (value == null) return null;
 
@@ -518,7 +518,7 @@ public abstract class YamlConfiguration {
      * @return The Material found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Material getMaterial(@NotNull final String path, @Nullable final Material def) {
+    public Material getMaterial(@NotNull final String path, @Nullable final Material def) {
         final Material value = getMaterial(path);
         return value == null ? def : value;
     }
@@ -579,7 +579,7 @@ public abstract class YamlConfiguration {
      * @throws IllegalArgumentException If the {@link ItemFlag} defined is invalid.
      * @throws RuntimeException         If the value is defined incorrectly and is unable to be read, for the Custom Data Tags.
      */
-    protected @NotNull ItemStack getItemStack(@NotNull final String path) throws InvalidPathException, IllegalArgumentException, RuntimeException {
+    public @NotNull ItemStack getItemStack(@NotNull final String path) throws InvalidPathException, IllegalArgumentException, RuntimeException {
         if (!contains(path)) throw new InvalidPathException(path, "Invalid path given. No item found!");
 
         final Material material = getMaterial(path + ".item");
@@ -696,7 +696,7 @@ public abstract class YamlConfiguration {
      * @return A list of all ItemStacks found at the path. If no ItemStacks are found, then an empty list.
      * @throws RuntimeException See {@link YamlConfiguration#getItemStack(String)}
      */
-    protected List<ItemStack> getItemStackList(@NotNull final String path) throws RuntimeException {
+    public List<ItemStack> getItemStackList(@NotNull final String path) throws RuntimeException {
         final List<ItemStack> list = new ArrayList<>();
         getKeys(path).forEach(key -> {
             try {
@@ -715,7 +715,7 @@ public abstract class YamlConfiguration {
      * @return The Sound found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Sound getSound(@NotNull final String path) {
+    public Sound getSound(@NotNull final String path) {
         final String value = getString(path);
         if (value == null) return null;
         final NamespacedKey key = NamespacedKey.fromString(value);
@@ -731,7 +731,7 @@ public abstract class YamlConfiguration {
      * @return The Sound found. Returns null if the path does not exist in the File, and no default value was defined,
      * otherwise returns the default value.
      */
-    protected Sound getSound(@NotNull final String path, @Nullable final Sound def) {
+    public Sound getSound(@NotNull final String path, @Nullable final Sound def) {
         final Sound sound = getSound(path);
         return sound == null ? def : sound;
     }
