@@ -749,6 +749,11 @@ public abstract class YamlConfiguration {
                 }
             }
         }
+        if (contains(path + ".custom_model_data")) {
+            final Integer value = getInt(path + ".custom_model_data");
+            if (value == null) throw new IllegalArgumentException("Error reading custom model data key %s. Value is either missing or configured incorrectly. The value must be a valid Integer!".formatted(path));
+            meta.setCustomModelData(value);
+        }
         item.setItemMeta(meta);
         return item;
     }
