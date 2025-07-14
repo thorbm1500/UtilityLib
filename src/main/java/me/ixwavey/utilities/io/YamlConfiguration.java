@@ -590,55 +590,54 @@ public abstract class YamlConfiguration {
     /**
      * Get an {@link ItemStack} from the specified path in the configuration file.
      * <br>
-     * The expected format can be viewed below. Any deviation from this format might cause errors to be thrown
-     * or might just be ignored all together.
-     * <pre>
-     * {@code
-     * item_entry:
-     *    item: DIAMOND
-     *    name: 'Item Name'
-     *    lore:
-     *      - 'Text Here'
-     *    amount: 64
-     *    enchantments:
-     *      UNBREAKING:3
-     *    potion_effects:
-     *      SWIFTNESS:
-     *        duration: 60
-     *        amplifier: 1
-     *        ambient: true
-     *        particles: true
+     * The expected format can be viewed below.
+     * Any deviation from this format <i>might</i> cause errors to be thrown
+     * or might just be <i>ignored all together</i>.
+     * <br>
+     * <h3>Available Parameters</h3>
+     * <li>{@code item} <i>required</i></li>
+     * <li>{@code name}</li>
+     * <li>{@code lore}</li>
+     * <li>{@code amount}</li>
+     * <li>{@code skull_texture}</li>
+     * <li>{@code glow}</li>
+     * <li>{@code enchantments}</li>
+     * <li>{@code potion_effects}</li>
+     * <li>{@code flags}</li>
+     * <li>{@code custom_data_tags}</li>
+     * <h3>Expected Format</h3>
+     * <pre><code>
+     *   entry_name:
+     *     item: Material
+     *     skull_texture: URL
+     *     name: String
+     *     lore:
+     *       - String
+     *     amount: Integer
+     *     glow: Boolean
+     *     enchantments:
+     *       enchantment: Integer
+     *     potion_effects:
+     *       effect:
+     *         duration: Integer
+     *         amplifier: Integer
+     *         ambient: Boolean
+     *         particles: Boolean
      *     flags:
-     *       - HIDE_ATTRIBUTES
+     *       - ItemFlag
      *     custom_data_tags:
      *       1:
-     *         namespace: namespace
-     *         key: key
-     *         type: int
-     *         value: 25
-     *    }
-     * </pre><br>
-     * Available Parameters
-     * <pre>
-     * {@code
-     * item
-     * name
-     * lore
-     * amount
-     * skull_texture
-     * glow
-     * enchantments
-     * potion_effects
-     * flags
-     * custom_data_tags
-     *    }
-     * </pre>
-     *
-     * @param path Path to get ItemStack from.
-     * @return The {@link ItemStack} found.
+     *         namespace: String
+     *         key: String
+     *         type: Object
+     *         value: Object
+     *     custom_model_data: Integer
+     * </code></pre>
+     * @param path                      Path to get ItemStack from.
+     * @return                          The {@link ItemStack} found.
      * @throws InvalidPathException     If the configuration file does not contain the path specified.
      * @throws IllegalArgumentException If the {@link Material} defined does not exist.
-     * @throws IllegalArgumentException If the {@link Material} defined is {@link Material#AIR}
+     * @throws IllegalArgumentException If the {@link Material} defined is {@link Material#AIR}.
      * @throws IllegalArgumentException If the {@link NamespacedKey} is defined incorrectly in Custom Data Tags.
      * @throws IllegalArgumentException If the {@link ItemFlag} defined is invalid.
      * @throws RuntimeException         If the value is defined incorrectly and is unable to be read, for the Custom Data Tags.
