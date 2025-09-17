@@ -1,4 +1,4 @@
-package me.ixwavey.utilities.world;
+package dev.prodzeus.utilities.world;
 
 import lombok.Getter;
 import org.bukkit.*;

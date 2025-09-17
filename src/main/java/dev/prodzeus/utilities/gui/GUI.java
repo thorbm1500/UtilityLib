@@ -1,7 +1,7 @@
-package me.ixwavey.utilities.gui;
+package dev.prodzeus.utilities.gui;
 
-import me.ixwavey.utilities.gui.util.*;
-import me.ixwavey.utilities.item.ItemUtil;
+import dev.prodzeus.utilities.gui.util.*;
+import dev.prodzeus.utilities.item.ItemUtil;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

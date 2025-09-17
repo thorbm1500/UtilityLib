@@ -1,4 +1,4 @@
-package me.ixwavey.utilities.formatting;
+package dev.prodzeus.utilities.formatting;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

@@ -1,4 +1,4 @@
-package me.ixwavey.utilities.commands;
+package dev.prodzeus.utilities.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

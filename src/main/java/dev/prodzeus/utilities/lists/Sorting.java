@@ -1,4 +1,4 @@
-package me.ixwavey.utilities.lists;
+package dev.prodzeus.utilities.lists;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,4 +1,4 @@
-package me.ixwavey.utilities.player;
+package dev.prodzeus.utilities.player;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

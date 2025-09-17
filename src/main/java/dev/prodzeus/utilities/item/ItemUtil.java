@@ -1,4 +1,4 @@
-package me.ixwavey.utilities.item;
+package dev.prodzeus.utilities.item;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;

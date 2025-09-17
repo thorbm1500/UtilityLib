@@ -1,4 +1,4 @@
-package me.ixwavey.utilities.other;
+package dev.prodzeus.utilities.other;
 
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.Contract;

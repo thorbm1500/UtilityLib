@@ -1,4 +1,4 @@
-package me.ixwavey.utilities.io;
+package dev.prodzeus.utilities.io;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import io.papermc.paper.registry.RegistryAccess;
@@ -260,7 +260,7 @@ public abstract class YamlConfiguration {
     @Contract(pure = true)
     public Set<String> getKeys(@NotNull final String path, final boolean deep, final @Nullable Set<String> def) {
         if (!contains(path)) return def;
-        return configuration().getConfigurationSection(path).getKeys(deep);
+        return Objects.requireNonNull(configuration().getConfigurationSection(path)).getKeys(deep);
     }
 
     @Contract(pure = true)
@@ -281,7 +281,7 @@ public abstract class YamlConfiguration {
     @Contract(pure = true)
     public Map<String, Object> getValues(@NotNull final String path, final boolean deep, @Nullable final Map<String, Object> def) {
         if (!contains(path)) return def;
-        return configuration().getConfigurationSection(path).getValues(deep);
+        return Objects.requireNonNull(configuration().getConfigurationSection(path)).getValues(deep);
     }
 
 
@@ -669,7 +669,7 @@ public abstract class YamlConfiguration {
             try {
                 final Registry<@NotNull Enchantment> enchantmentRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
                 for (final var index : getValues(path + ".enchantments").entrySet()) {
-                    final Enchantment enchant = enchantmentRegistry.get(NamespacedKey.fromString(index.getKey().substring((path + ".enchantments.").length()).toUpperCase()));
+                    final Enchantment enchant = enchantmentRegistry.get(Objects.requireNonNull(NamespacedKey.fromString(index.getKey().substring((path + ".enchantments.").length()).toUpperCase())));
                     if (enchant == null) continue;
                     final Integer level = (Integer) index.getValue();
                     meta.addEnchant(enchant, level == null ? 1 : level, true);

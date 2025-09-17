@@ -1,4 +1,4 @@
-package me.ixwavey.utilities.other;
+package dev.prodzeus.utilities.other;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

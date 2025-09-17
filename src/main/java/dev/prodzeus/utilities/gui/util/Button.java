@@ -1,4 +1,4 @@
-package me.ixwavey.utilities.gui.util;
+package dev.prodzeus.utilities.gui.util;
 
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;

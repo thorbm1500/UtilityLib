@@ -1,4 +1,4 @@
-package me.ixwavey.utilities.gui.util;
+package dev.prodzeus.utilities.gui.util;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 

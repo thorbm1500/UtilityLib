@@ -1,7 +1,7 @@
-package me.ixwavey.utilities.gui.util;
+package dev.prodzeus.utilities.gui.util;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
-import me.ixwavey.utilities.gui.GUI;
+import dev.prodzeus.utilities.gui.GUI;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
