@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.InvalidPathException;
 import java.util.*;
@@ -45,7 +46,7 @@ public abstract class YamlConfiguration {
         if (!fileName.endsWith(".yml")) fileName += ".yml";
         this.fileName = fileName;
 
-        save();
+        init();
         reload();
     }
 
@@ -53,10 +54,20 @@ public abstract class YamlConfiguration {
      * Saves the file with the current {@link FileConfiguration}.
      * If a file does not already exist, it will be created.
      */
+    protected void init() {
+        if(file == null){
+            file = file();
+        }
+        if (!file.exists()) plugin.saveResource(fileName, true);
+    }
+    
     @SneakyThrows
     protected void save() {
-        plugin.saveResource(fileName, false);
-        if (fileConfiguration != null) fileConfiguration.save(getFile());
+        if(fileConfiguration == null || file == null){
+            return;
+        }
+        
+        fileConfiguration.save(file);
     }
 
     /**
