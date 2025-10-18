@@ -55,7 +55,7 @@ public abstract class YamlConfiguration {
      */
     @SneakyThrows
     protected void save() {
-        plugin.saveResource(fileName, true);
+        plugin.saveResource(fileName, false);
         if (fileConfiguration != null) fileConfiguration.save(getFile());
     }
 
