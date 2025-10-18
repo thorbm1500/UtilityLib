@@ -146,7 +146,7 @@ public abstract class GUI<E extends Enum<E>> implements Listener {
      * @param title  The title of the inventory.
      * @param filler The item the inventory is filled with as background.
      */
-    public GUI(final Plugin plugin, final Player player, final InventorySize size, @Nullable final String title, @Nullable final Filler filler, final Class<E> enumClass) {
+    public GUI(final Plugin plugin, @NotNull final Player player, final InventorySize size, @Nullable final String title, @Nullable final Filler filler, final Class<E> enumClass) {
         this.plugin = plugin;
         this.player = player;
         this.uuid = player.getUniqueId();
